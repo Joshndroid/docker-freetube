@@ -38,7 +38,8 @@ RUN \
     /config/.cache \
     /var/lib/apt/lists/* \
     /var/tmp/* \
-    /tmp/*
+    /tmp/* && \
+  dpkg-query -W -f='${Package}\t${Version}\t${Architecture}\n' > /package_versions.txt
 
 # add local files
 COPY /root /

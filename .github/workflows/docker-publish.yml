@@ -45,3 +45,19 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64
+
+      - name: Extract package_versions.txt from image
+        if: ${{ github.event_name != 'pull_request' }}
+        run: |
+          IMAGE_TAG=$(echo "${{ steps.meta.outputs.tags }}" | cut -d',' -f1)
+          docker pull $IMAGE_TAG
+          docker create --name temp_container $IMAGE_TAG
+          docker cp temp_container:/package_versions.txt ./package_versions.txt
+          docker rm temp_container
+
+      - name: Upload package_versions.txt as artifact
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: package_versions
+          path: ./package_versions.txt
