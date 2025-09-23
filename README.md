@@ -4,7 +4,7 @@
 # I have no real use for the arm64 so i have removed building it.
 # TBH I am using this as a learning experience.
 # linuxserver.io are amazing at what they do and really deserve everyone's support
-# I moved over to their 'Selkies' base images.
+# I moved over to their 'Selkies' base images branch.
 # I will likely remove various links mainly to avoid confusion. 
 
 [![linuxserver.io](https://raw.githubusercontent.com/linuxserver/docker-templates/master/linuxserver.io/img/linuxserver_medium.png)](https://linuxserver.io)
@@ -56,7 +56,7 @@ The architectures supported by this image are:
 
 | Architecture | Available | Tag |
 | :----: | :----: | ---- |
-| x86-64 | ✅ | amd64-\<version tag\> |
+| x86-64 | ✅ | lastest, vX.X, selkies-dev|
 | arm64 | ❌ | |
 | armhf | ❌ | |
 
