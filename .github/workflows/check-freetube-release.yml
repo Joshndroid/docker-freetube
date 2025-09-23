@@ -8,17 +8,20 @@ on:
 jobs:
   check-and-trigger:
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed for gh CLI auth
     steps:
       - name: Get latest FreeTube release ID
         id: freetube_release
         run: |
-          RELEASE_ID=$(curl -sL 'https://api.github.com/repos/FreeTubeApp/FreeTube/releases' | jq -r 'map(select(.prerelease)) | first | .id')
+          RELEASE_ID=$(curl -sL 'https://api.github.com/repos/FreeTubeApp/FreeTube/releases' \
+            | jq -r 'map(select(.prerelease)) | first | .id')
           echo "release_id=$RELEASE_ID" >> $GITHUB_OUTPUT
 
       - name: Get last built version from Docker image
         id: last_version
         run: |
-          IMAGE="ghcr.io/${{ github.repository }}:selkies"
+          IMAGE="ghcr.io/${{ github.repository }}:selkies-dev"
           docker pull $IMAGE || true
           LABEL=$(docker inspect $IMAGE --format '{{ index .Config.Labels "build_version" }}' || echo "")
           VERSION=$(echo $LABEL | awk '{print $3}')
@@ -28,4 +31,4 @@ jobs:
         if: steps.freetube_release.outputs.release_id != steps.last_version.outputs.last_version
         run: |
           echo "New FreeTube release detected. Triggering Docker build..."
-          gh workflow run docker-publish.yml -f ref=selkies
+          gh workflow run docker-publish.yml -f ref=selkies-dev
