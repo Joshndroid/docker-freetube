@@ -4,8 +4,8 @@ FROM ghcr.io/linuxserver/baseimage-selkies:debianbookworm
 ARG BUILD_DATE
 ARG VERSION
 ARG FREETUBE_VERSION
-LABEL build_version="Linuxserver.io version:- ${VERSION} Build-date:- ${BUILD_DATE}"
-LABEL maintainer="thelamer"
+LABEL build_version="Joshndroid version:- ${VERSION} Build-date:- ${BUILD_DATE}"
+LABEL maintainer="Joshndroid"
 
 # title
 ENV TITLE=FreeTube
