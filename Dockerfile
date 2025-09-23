@@ -4,8 +4,8 @@ FROM ghcr.io/linuxserver/baseimage-selkies:debianbookworm
 ARG BUILD_DATE
 ARG VERSION
 ARG FREETUBE_VERSION
-LABEL build_version="Linuxserver.io version:- ${VERSION} Build-date:- ${BUILD_DATE}"
-LABEL maintainer="thelamer"
+LABEL build_version="Joshndroid version:- ${VERSION} Build-date:- ${BUILD_DATE}"
+LABEL maintainer="Joshndroid"
 
 # title
 ENV TITLE=FreeTube
@@ -14,7 +14,7 @@ RUN \
    echo "**** add icon ****" && \
    curl -o \
      /usr/share/selkies/www/icon.png \
-     https://raw.githubusercontent.com/linuxserver/docker-templates/master/linuxserver.io/img/freetube-logo.png && \
+     https://raw.githubusercontent.com/FreeTubeApp/FreeTube/development/_icons/iconColor.png && \
   echo "**** install packages ****" && \
   apt-get update && \
   apt-get install -y --no-install-recommends \
