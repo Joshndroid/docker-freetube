@@ -11,6 +11,9 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed for gh CLI auth
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
       - name: Get latest FreeTube release ID
         id: freetube_release
         run: |
@@ -30,5 +33,5 @@ jobs:
       - name: Compare versions and trigger build
         if: steps.freetube_release.outputs.release_id != steps.last_version.outputs.last_version
         run: |
-          echo "New FreeTube release detected. Triggering Docker build..."
+          echo "New FreeTube release detected. Triggering Docker build on selkies-dev branch..."
           gh workflow run docker-publish.yml -f ref=selkies-dev
