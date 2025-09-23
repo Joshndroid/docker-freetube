@@ -5,10 +5,6 @@ on:
     - cron: '0 6 * * 0' # every Sunday at 06:00 UTC
   workflow_dispatch:
 
-permissions:
-  contents: read
-  workflows: write   # required to trigger another workflow
-
 jobs:
   check-and-trigger:
     runs-on: ubuntu-latest
@@ -47,7 +43,7 @@ jobs:
         if: steps.freetube_release.outputs.release_id != steps.last_release.outputs.last_id
         run: |
           echo "New FreeTube release detected. Triggering Docker build on selkies-dev..."
-          gh workflow run docker-publish.yml \
+          gh workflow run "Build and Publish Docker image" \
             --repo ${{ github.repository }} \
             --ref selkies-dev
 
