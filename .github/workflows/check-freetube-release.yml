@@ -45,11 +45,15 @@ jobs:
           echo "New FreeTube release detected. Triggering Docker build on selkies-dev..."
           gh workflow run docker-publish.yml --repo ${{ github.repository }} -f ref=selkies-dev
 
-      # Save the latest release ID as a new artifact
-      - name: Upload last built release ID
+      # Step 1: Save the latest release ID to a file
+      - name: Save last release ID to file
         if: steps.freetube_release.outputs.release_id != steps.last_release.outputs.last_id
         run: |
           echo "${{ steps.freetube_release.outputs.release_id }}" > .last_freetube_id
+
+      # Step 2: Upload the last release ID as an artifact
+      - name: Upload last built release ID
+        if: steps.freetube_release.outputs.release_id != steps.last_release.outputs.last_id
         uses: actions/upload-artifact@v4
         with:
           name: last_freetube_id
