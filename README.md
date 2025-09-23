@@ -1,50 +1,25 @@
 ## 23/09/2025 Update
 ## NOTICE 
-# I have forked the original project from linuxserver.io as they have archived/depricated it
-# I have no real use for the arm64 so i have removed building it.
-# TBH I am using this as a learning experience.
-# linuxserver.io are amazing at what they do and really deserve everyone's support
-# I moved over to their 'Selkies' base images branch.
-# I will likely remove various links mainly to avoid confusion. 
+* I have forked the original project from linuxserver.io as they have archived/depricated it
+* I have no real use for the arm64 so i have removed building it.
+* TBH I am using this as a learning experience.
+* linuxserver.io are amazing at what they do and really deserve everyone's support
+* I moved over to their 'Selkies' base images branch.
+* I will likely remove various links mainly to avoid confusion. 
 
-[![linuxserver.io](https://raw.githubusercontent.com/linuxserver/docker-templates/master/linuxserver.io/img/linuxserver_medium.png)](https://linuxserver.io)
-
-[![Blog](https://img.shields.io/static/v1.svg?color=94398d&labelColor=555555&logoColor=ffffff&style=for-the-badge&label=linuxserver.io&message=Blog)](https://blog.linuxserver.io "all the things you can do with our containers including How-To guides, opinions and much more!")
-[![Discord](https://img.shields.io/discord/354974912613449730.svg?color=94398d&labelColor=555555&logoColor=ffffff&style=for-the-badge&label=Discord&logo=discord)](https://linuxserver.io/discord "realtime support / chat with the community and the team.")
-[![Discourse](https://img.shields.io/discourse/https/discourse.linuxserver.io/topics.svg?color=94398d&labelColor=555555&logoColor=ffffff&style=for-the-badge&logo=discourse)](https://discourse.linuxserver.io "post on our community forum.")
-[![Fleet](https://img.shields.io/static/v1.svg?color=94398d&labelColor=555555&logoColor=ffffff&style=for-the-badge&label=linuxserver.io&message=Fleet)](https://fleet.linuxserver.io "an online web interface which displays all of our maintained images.")
-[![GitHub](https://img.shields.io/static/v1.svg?color=94398d&labelColor=555555&logoColor=ffffff&style=for-the-badge&label=linuxserver.io&message=GitHub&logo=github)](https://github.com/linuxserver "view the source for all of our repositories.")
-[![Open Collective](https://img.shields.io/opencollective/all/linuxserver.svg?color=94398d&labelColor=555555&logoColor=ffffff&style=for-the-badge&label=Supporters&logo=open%20collective)](https://opencollective.com/linuxserver "please consider helping us by either donating or contributing to our budget")
-
-The [LinuxServer.io](https://linuxserver.io) team brings you another container release featuring:
+# Joshndroid is trying to keep this container alive featuring:
 
 * regular and timely application updates
 * easy user mappings (PGID, PUID)
 * custom base image with s6 overlay
-* weekly base OS updates with common layers across the entire LinuxServer.io ecosystem to minimise space usage, down time and bandwidth
-* regular security updates
+* based on the awesome base images supplied by linuxserver.io
 
-Find us at:
+# Linuxserver.io Credits
 
-* [Blog](https://blog.linuxserver.io) - all the things you can do with our containers including How-To guides, opinions and much more!
-* [Discord](https://linuxserver.io/discord) - realtime support / chat with the community and the team.
-* [Discourse](https://discourse.linuxserver.io) - post on our community forum.
-* [Fleet](https://fleet.linuxserver.io) - an online web interface which displays all of our maintained images.
-* [GitHub](https://github.com/linuxserver) - view the source for all of our repositories.
-* [Open Collective](https://opencollective.com/linuxserver) - please consider helping us by either donating or contributing to our budget
+[![linuxserver.io](https://raw.githubusercontent.com/linuxserver/docker-templates/master/linuxserver.io/img/linuxserver_small.png)](https://linuxserver.io)
 
-# [linuxserver/freetube](https://github.com/linuxserver/docker-freetube)
-
-[![Scarf.io pulls](https://scarf.sh/installs-badge/linuxserver-ci/linuxserver%2Ffreetube?color=94398d&label-color=555555&logo-color=ffffff&style=for-the-badge&package-type=docker)](https://scarf.sh)
-[![GitHub Stars](https://img.shields.io/github/stars/linuxserver/docker-freetube.svg?color=94398d&labelColor=555555&logoColor=ffffff&style=for-the-badge&logo=github)](https://github.com/linuxserver/docker-freetube)
-[![GitHub Release](https://img.shields.io/github/release/linuxserver/docker-freetube.svg?color=94398d&labelColor=555555&logoColor=ffffff&style=for-the-badge&logo=github)](https://github.com/linuxserver/docker-freetube/releases)
-[![GitHub Package Repository](https://img.shields.io/static/v1.svg?color=94398d&labelColor=555555&logoColor=ffffff&style=for-the-badge&label=linuxserver.io&message=GitHub%20Package&logo=github)](https://github.com/linuxserver/docker-freetube/packages)
-[![GitLab Container Registry](https://img.shields.io/static/v1.svg?color=94398d&labelColor=555555&logoColor=ffffff&style=for-the-badge&label=linuxserver.io&message=GitLab%20Registry&logo=gitlab)](https://gitlab.com/linuxserver.io/docker-freetube/container_registry)
-[![Quay.io](https://img.shields.io/static/v1.svg?color=94398d&labelColor=555555&logoColor=ffffff&style=for-the-badge&label=linuxserver.io&message=Quay.io)](https://quay.io/repository/linuxserver.io/freetube)
-[![Docker Pulls](https://img.shields.io/docker/pulls/linuxserver/freetube.svg?color=94398d&labelColor=555555&logoColor=ffffff&style=for-the-badge&label=pulls&logo=docker)](https://hub.docker.com/r/linuxserver/freetube)
-[![Docker Stars](https://img.shields.io/docker/stars/linuxserver/freetube.svg?color=94398d&labelColor=555555&logoColor=ffffff&style=for-the-badge&label=stars&logo=docker)](https://hub.docker.com/r/linuxserver/freetube)
-[![Jenkins Build](https://img.shields.io/jenkins/build?labelColor=555555&logoColor=ffffff&style=for-the-badge&jobUrl=https%3A%2F%2Fci.linuxserver.io%2Fjob%2FDocker-Pipeline-Builders%2Fjob%2Fdocker-freetube%2Fjob%2Fselkies%2F&logo=jenkins)](https://ci.linuxserver.io/job/Docker-Pipeline-Builders/job/docker-freetube/job/selkies/)
-[![LSIO CI](https://img.shields.io/badge/dynamic/yaml?color=94398d&labelColor=555555&logoColor=ffffff&style=for-the-badge&label=CI&query=CI&url=https%3A%2F%2Fci-tests.linuxserver.io%2Flinuxserver%2Ffreetube%2Fselkies%2Fci-status.yml)](https://ci-tests.linuxserver.io/linuxserver/freetube/selkies/index.html)
+* [GitHub](https://github.com/linuxserver) - view the source for all of linuxserver.io repositories.
+* [Open Collective](https://opencollective.com/linuxserver) - please consider helping linuxserver.io by either donating or contributing to their budget
 
 [FreeTube](https://freetubeapp.io/) is a feature-rich and user-friendly YouTube client with a focus on privacy.
 
