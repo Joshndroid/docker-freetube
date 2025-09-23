@@ -8,10 +8,12 @@ on:
 jobs:
   check-and-trigger:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      # Get the latest FreeTube pre-release ID
       - name: Get latest FreeTube release ID
         id: freetube_release
         run: |
@@ -19,15 +21,13 @@ jobs:
             | jq -r 'map(select(.prerelease)) | first | .id')
           echo "release_id=$RELEASE_ID" >> $GITHUB_OUTPUT
 
-      # Download the last built release ID artifact from previous runs
       - name: Download previous last release artifact
         uses: actions/download-artifact@v4
         with:
           name: last_freetube_id
           path: ./last_id
-        continue-on-error: true  # artifact may not exist yet
+        continue-on-error: true
 
-      # Read last release ID from artifact
       - name: Read last release
         id: last_release
         run: |
@@ -38,25 +38,11 @@ jobs:
           fi
           echo "last_id=$LAST_ID" >> $GITHUB_OUTPUT
 
-      # Compare and trigger dev Docker build if new release
       - name: Compare and trigger dev build
         if: steps.freetube_release.outputs.release_id != steps.last_release.outputs.last_id
         run: |
           echo "New FreeTube release detected. Triggering Docker build on selkies-dev..."
           gh workflow run "Build and Publish Docker image" \
             --repo ${{ github.repository }} \
-            --ref selkies-dev
-
-      # Step 1: Save the latest release ID to a file
-      - name: Save last release ID to file
-        if: steps.freetube_release.outputs.release_id != steps.last_release.outputs.last_id
-        run: |
-          echo "${{ steps.freetube_release.outputs.release_id }}" > .last_freetube_id
-
-      # Step 2: Upload the last release ID as an artifact
-      - name: Upload last built release ID
-        if: steps.freetube_release.outputs.release_id != steps.last_release.outputs.last_id
-        uses: actions/upload-artifact@v4
-        with:
-          name: last_freetube_id
-          path: .last_freetube_id
+            --ref selkies-dev \
+            --field release_id=${{ steps.freetube_release.outputs.release_id }}

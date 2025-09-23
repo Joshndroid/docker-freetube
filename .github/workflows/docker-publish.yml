@@ -1,13 +1,17 @@
 name: Build and Publish Docker image
 
 on:
+  workflow_dispatch:
+    inputs:
+      release_id:
+        description: 'FreeTube release ID'
+        required: false
   push:
     branches:
       - selkies-dev
   pull_request:
     branches:
       - selkies-dev
-  workflow_dispatch:
 
 jobs:
   build-and-push:
@@ -73,3 +77,14 @@ jobs:
         with:
           name: changelog
           path: CHANGELOG.md
+
+      - name: Save last release ID to file
+        if: ${{ github.event.inputs.release_id != '' }}
+        run: echo "${{ github.event.inputs.release_id }}" > .last_freetube_id
+
+      - name: Upload last built release ID
+        if: ${{ github.event.inputs.release_id != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: last_freetube_id
+          path: .last_freetube_id
