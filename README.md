@@ -81,27 +81,83 @@ The application can be accessed at:
 
 By default this container has no authentication and the optional environment variables `CUSTOM_USER` and `PASSWORD` to enable basic http auth via the embedded NGINX server should only be used to locally secure the container from unwanted access on a local network. If exposing this to the Internet we recommend putting it behind a reverse proxy, such as [SWAG](https://github.com/linuxserver/docker-swag), and ensuring a secure authentication solution is in place. From the web interface a terminal can be launched and it is configured for passwordless sudo, so anyone with access to it can install and run whatever they want along with probing your local network.
 
-### Options in all KasmVNC based GUI containers
+### Linuxserver.io Selkies based GUI containers
 
-This container is based on [Docker Baseimage KasmVNC](https://github.com/linuxserver/docker-baseimage-kasmvnc) which means there are additional environment variables and run configurations to enable or disable specific functionality.
+This container is based on [Docker Baseimage Selkies](github.com/linuxserver/docker-baseimage-selkies) which means there are additional environment variables and run configurations to enable or disable specific functionality.
 
-#### Optional environment variables
+These images contain the following services:
+
+* [Selkies](https://github.com/selkies-project) - The core technology for interacting with a containerized desktop from a web browser.
+* [pixelflux](https://github.com/linuxserver/pixelflux/) - The core video/image rendering pipeline.
+* [pcmflux](https://github.com/linuxserver/pcmflux) - Lean low level web native opus audio encoder. 
+* [NGINX](https://www.nginx.com/) - Used to serve Selkies with the appropriate paths and provide basic auth.
+* [Docker](https://www.docker.com/) - Can be used for interacting with a mounted in Docker socket or if the container is run in privileged mode will start a [DinD](https://www.docker.com/blog/docker-can-now-run-within-docker/) setup.
+* [PulseAudio](https://www.freedesktop.org/wiki/Software/PulseAudio/) - Sound subsystem used to capture audio from the active desktop session and send it to the browser.
+
+# Options
+
+**Authentication for these containers is included as a convenience and to keep in sync with the previous KasmVNC containers they replace. We use bash to substitute in settings user/password and some strings might break that. In general this authentication mechanism should be used to keep the kids out not the internet**
+
+If you are looking for a robust secure application gateway please check out [SWAG](https://github.com/linuxserver/docker-swag).
+
+All application settings are passed via environment variables:
 
 | Variable | Description |
 | :----: | --- |
 | CUSTOM_PORT | Internal port the container listens on for http if it needs to be swapped from the default 3000. |
 | CUSTOM_HTTPS_PORT | Internal port the container listens on for https if it needs to be swapped from the default 3001. |
+| CUSTOM_WS_PORT | Internal port the container listens on for websockets if it needs to be swapped from the default 8082. |
 | CUSTOM_USER | HTTP Basic auth username, abc is default. |
 | PASSWORD | HTTP Basic auth password, abc is default. If unset there will be no auth |
 | SUBFOLDER | Subfolder for the application if running a subfolder reverse proxy, need both slashes IE `/subfolder/` |
-| TITLE | The page title displayed on the web browser, default "KasmVNC Client". |
-| FM_HOME | This is the home directory (landing) for the file manager, default "/config". |
+| TITLE | The page title displayed on the web browser, default "Selkies - webrtc". |
 | START_DOCKER | If set to false a container with privilege will not automatically start the DinD Docker setup. |
-| DRINODE | If mounting in /dev/dri for [DRI3 GPU Acceleration](https://www.kasmweb.com/kasmvnc/docs/master/gpu_acceleration.html) allows you to specify the device to use IE `/dev/dri/renderD128` |
-| DISABLE_IPV6 | If set to true or any value this will disable IPv6 | 
+| DISABLE_IPV6 | If set to true or any value this will disable IPv6 |
 | LC_ALL | Set the Language for the container to run as IE `fr_FR.UTF-8` `ar_AE.UTF-8` |
-| NO_DECOR | If set the application will run without window borders in openbox for use as a PWA. |
+| NO_DECOR | If set the application will run without window borders for use as a PWA. (Decor can be enabled and disabled with Ctrl+Shift+d) |
 | NO_FULL | Do not autmatically fullscreen applications when using openbox. |
+| DISABLE_ZINK | Do not set the Zink environment variables if a video card is detected (userspace applications will use CPU rendering) |
+| WATERMARK_PNG | Full path inside the container to a watermark png IE `/usr/share/selkies/www/icon.png` |
+| WATERMARK_LOCATION | Where to paint the image over the stream integer options below |
+| MAX_RES | Pass a larger maximum resolution for the container default is 16k `15360x8640` |
+
+* 1 - Top Left
+* 2 - Top Right
+* 3 - Bottom Left
+* 4 - Bottom Right
+* 5 - Centered
+* 6 - Animated
+
+### DRI3 GPU Acceleration
+
+For accelerated apps or games, render devices can be mounted into the container and leveraged by applications using:
+
+`--device /dev/dri:/dev/dri`
+
+This feature only supports **Open Source** GPU drivers:
+
+| Driver | Description |
+| :----: | --- |
+| Intel | i965 and i915 drivers for Intel iGPU chipsets |
+| AMD | AMDGPU, Radeon, and ATI drivers for AMD dedicated or APU chipsets |
+| NVIDIA | nouveau2 drivers only, closed source NVIDIA drivers lack DRI3 support |
+
+The `DRINODE` environment variable can be used to point to a specific GPU.
+
+DRI3 will work on aarch64 given the correct drivers are installed inside the container for your chipset.
+
+### Nvidia GPU Support
+
+**Note: Nvidia support is not available for Alpine-based images.**
+
+Nvidia GPU support is available by leveraging Zink for OpenGL. When a compatible Nvidia GPU is passed through, it will also be **automatically utilized for hardware-accelerated video stream encoding** (using the `x264enc` full-frame profile), significantly reducing CPU load.
+
+Enable Nvidia support with the following runtime flags:
+
+| Flag | Description |
+| :----: | --- |
+| `--gpus all` | Passes all available host GPUs to the container. This can be filtered to specific GPUs. |
+| `--runtime nvidia` | Specifies the Nvidia runtime, which provides the necessary drivers and tools from the host. |
 
 #### Optional run configurations
 
@@ -135,7 +191,7 @@ If you run system native installations of software IE `sudo apt-get install file
 proot-apps install filezilla
 ```
 
-PRoot Apps is included in all KasmVNC based containers, a list of linuxserver.io supported applications is located [HERE](https://github.com/linuxserver/proot-apps?tab=readme-ov-file#supported-apps).
+PRoot Apps should be included (to the best of my knowledge) in this container, a list of linuxserver.io supported applications is located [HERE](https://github.com/linuxserver/proot-apps?tab=readme-ov-file#supported-apps).
 
 #### Native Apps
 
