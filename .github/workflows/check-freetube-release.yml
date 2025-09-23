@@ -1,4 +1,4 @@
-name: Check for New FreeTube Release
+name: Check for New FreeTube Release (Dev)
 
 on:
   schedule:
@@ -9,11 +9,8 @@ jobs:
   check-and-trigger:
     runs-on: ubuntu-latest
     env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed for gh CLI auth
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed for gh CLI auth
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
       - name: Get latest FreeTube release ID
         id: freetube_release
         run: |
@@ -21,17 +18,9 @@ jobs:
             | jq -r 'map(select(.prerelease)) | first | .id')
           echo "release_id=$RELEASE_ID" >> $GITHUB_OUTPUT
 
-      - name: Get last built version from Docker image
-        id: last_version
-        run: |
-          IMAGE="ghcr.io/${{ github.repository }}:selkies-dev"
-          docker pull $IMAGE || true
-          LABEL=$(docker inspect $IMAGE --format '{{ index .Config.Labels "build_version" }}' || echo "")
-          VERSION=$(echo $LABEL | awk '{print $3}')
-          echo "last_version=$VERSION" >> $GITHUB_OUTPUT
-
-      - name: Compare versions and trigger build
-        if: steps.freetube_release.outputs.release_id != steps.last_version.outputs.last_version
+      - name: Trigger dev Docker build
+        if: steps.freetube_release.outputs.release_id != ''
         run: |
           echo "New FreeTube release detected. Triggering Docker build on selkies-dev branch..."
-          gh workflow run docker-publish.yml -f ref=selkies-dev
+          # Use the workflow ID or filename with explicit repo reference
+          gh workflow run docker-publish.yml --repo ${{ github.repository }} -f ref=selkies-dev
