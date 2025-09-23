@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       release_id:
-        description: 'FreeTube release ID'
+        description: 'FreeTube release ID (optional)'
         required: false
   push:
     branches:
@@ -22,6 +22,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Get latest FreeTube release ID
+        id: freetube_release
+        run: |
+          RELEASE_ID=$(curl -sL 'https://api.github.com/repos/FreeTubeApp/FreeTube/releases' \
+            | jq -r 'map(select(.prerelease)) | first | .id')
+          echo "release_id=$RELEASE_ID" >> $GITHUB_OUTPUT
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -79,11 +86,9 @@ jobs:
           path: CHANGELOG.md
 
       - name: Save last release ID to file
-        if: ${{ github.event.inputs.release_id != '' }}
-        run: echo "${{ github.event.inputs.release_id }}" > .last_freetube_id
+        run: echo "${{ steps.freetube_release.outputs.release_id }}" > .last_freetube_id
 
       - name: Upload last built release ID
-        if: ${{ github.event.inputs.release_id != '' }}
         uses: actions/upload-artifact@v4
         with:
           name: last_freetube_id
