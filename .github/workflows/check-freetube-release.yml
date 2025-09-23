@@ -5,6 +5,10 @@ on:
     - cron: '0 6 * * 0' # every Sunday at 06:00 UTC
   workflow_dispatch:
 
+permissions:
+  contents: read
+  workflows: write   # required to trigger another workflow
+
 jobs:
   check-and-trigger:
     runs-on: ubuntu-latest
@@ -43,7 +47,9 @@ jobs:
         if: steps.freetube_release.outputs.release_id != steps.last_release.outputs.last_id
         run: |
           echo "New FreeTube release detected. Triggering Docker build on selkies-dev..."
-          gh workflow run docker-publish.yml --repo ${{ github.repository }} -f ref=selkies-dev
+          gh workflow run docker-publish.yml \
+            --repo ${{ github.repository }} \
+            --ref selkies-dev
 
       # Step 1: Save the latest release ID to a file
       - name: Save last release ID to file
