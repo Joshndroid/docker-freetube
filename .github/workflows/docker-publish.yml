@@ -61,3 +61,14 @@ jobs:
         with:
           name: package_versions
           path: ./package_versions.txt
+          
+      - name: Generate changelog
+        uses: heinrichreimer/github-changelog-generator-action@v2.3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload changelog as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: changelog
+          path: CHANGELOG.md
