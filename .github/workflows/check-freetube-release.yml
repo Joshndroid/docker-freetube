@@ -9,8 +9,9 @@ jobs:
   check-and-trigger:
     runs-on: ubuntu-latest
     env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed for gh CLI auth
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
+      # Get the latest FreeTube pre-release ID
       - name: Get latest FreeTube release ID
         id: freetube_release
         run: |
@@ -18,9 +19,38 @@ jobs:
             | jq -r 'map(select(.prerelease)) | first | .id')
           echo "release_id=$RELEASE_ID" >> $GITHUB_OUTPUT
 
-      - name: Trigger dev Docker build
-        if: steps.freetube_release.outputs.release_id != ''
+      # Download the last built release ID artifact from previous runs
+      - name: Download previous last release artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: last_freetube_id
+          path: ./last_id
+        continue-on-error: true  # artifact may not exist yet
+
+      # Read last release ID from artifact
+      - name: Read last release
+        id: last_release
         run: |
-          echo "New FreeTube release detected. Triggering Docker build on selkies-dev branch..."
-          # Use the workflow ID or filename with explicit repo reference
+          if [ -f ./last_id/.last_freetube_id ]; then
+            LAST_ID=$(cat ./last_id/.last_freetube_id)
+          else
+            LAST_ID=""
+          fi
+          echo "last_id=$LAST_ID" >> $GITHUB_OUTPUT
+
+      # Compare and trigger dev Docker build if new release
+      - name: Compare and trigger dev build
+        if: steps.freetube_release.outputs.release_id != steps.last_release.outputs.last_id
+        run: |
+          echo "New FreeTube release detected. Triggering Docker build on selkies-dev..."
           gh workflow run docker-publish.yml --repo ${{ github.repository }} -f ref=selkies-dev
+
+      # Save the latest release ID as a new artifact
+      - name: Upload last built release ID
+        if: steps.freetube_release.outputs.release_id != steps.last_release.outputs.last_id
+        run: |
+          echo "${{ steps.freetube_release.outputs.release_id }}" > .last_freetube_id
+        uses: actions/upload-artifact@v4
+        with:
+          name: last_freetube_id
+          path: .last_freetube_id
