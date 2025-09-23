@@ -47,10 +47,23 @@ jobs:
 
       - name: Extract package_versions.txt from image
         run: |
-          IMAGE_TAG=$(echo "${{ steps.meta.outputs.tags }}" | cut -d',' -f1)
+          # Use the first tag from metadata
+          IMAGE_TAG=$(echo "${{ steps.meta.outputs.tags }}" | tr ',' '\n' | head -n 1)
+          echo "Trying IMAGE_TAG=$IMAGE_TAG"
+          
           docker pull $IMAGE_TAG
-          docker create --name temp_container $IMAGE_TAG
-          docker cp temp_container:/package_versions.txt ./package_versions.txt
+          docker create --name temp_container $IMAGE_TAG || exit 1
+          
+          if ! docker cp temp_container:/package_versions.txt ./package_versions.txt 2>/dev/null; then
+            echo "Versioned tag missing package_versions.txt, falling back to latest"
+            docker rm temp_container
+            IMAGE_TAG=$(echo "${{ steps.meta.outputs.tags }}" | tr ',' '\n' | grep 'latest' | head -n 1)
+            echo "Using fallback IMAGE_TAG=$IMAGE_TAG"
+            docker pull $IMAGE_TAG
+            docker create --name temp_container $IMAGE_TAG
+            docker cp temp_container:/package_versions.txt ./package_versions.txt
+          fi
+          
           docker rm temp_container
 
       - name: Upload package_versions.txt as artifact
