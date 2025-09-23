@@ -16,8 +16,7 @@
 
 # Linuxserver.io Credits
 
-[![linuxserver.io](https://raw.githubusercontent.com/linuxserver/docker-templates/master/linuxserver.io/img/linuxserver_small.png)](https://linuxserver.io)
-
+* Thanks to linuxserver.io for creating the original container and keeping the selkies images alive.
 * [GitHub](https://github.com/linuxserver) - view the source for all of linuxserver.io repositories.
 * [Open Collective](https://opencollective.com/linuxserver) - please consider helping linuxserver.io by either donating or contributing to their budget
 
