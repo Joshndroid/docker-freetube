@@ -31,8 +31,8 @@ jobs:
       - name: Read last release
         id: last_release
         run: |
-          if [ -f ./last_id/.last_freetube_id ]; then
-            LAST_ID=$(cat ./last_id/.last_freetube_id)
+          if [ -f ./last_id/last_freetube_id.txt ]; then
+            LAST_ID=$(cat ./last_id/last_freetube_id.txt)
           else
             LAST_ID=""
           fi
