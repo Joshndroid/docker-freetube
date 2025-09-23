@@ -209,6 +209,7 @@ To help you get started creating a container from this image you can either use 
 
 >[!NOTE]
 >Unless a parameter is flaged as 'optional', it is *mandatory* and a value must be provided.
+>You can utilise either, latest, vX.X (for a specific version), or the dev branch selkies-dev
 
 ### docker-compose (recommended, [click here for more info](https://docs.linuxserver.io/general/docker-compose))
 
@@ -216,7 +217,7 @@ To help you get started creating a container from this image you can either use 
 ---
 services:
   freetube:
-    image: lscr.io/linuxserver/freetube:selkies
+    image: ghcr.io/joshndroid/docker-freetube:latest
     container_name: freetube
     security_opt:
       - seccomp:unconfined #optional
@@ -247,7 +248,7 @@ docker run -d \
   -v /path/to/config:/config \
   --shm-size="1gb" \
   --restart unless-stopped \
-  lscr.io/linuxserver/freetube:selkies
+  ghcr.io/joshndroid/docker-freetube:latest
 ```
 
 ## Parameters
