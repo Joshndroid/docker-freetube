@@ -125,56 +125,6 @@ To install cjk fonts on startup as an example pass the environment variables (Al
 
 The web interface has the option for "IME Input Mode" in Settings which will allow non english characters to be used from a non en_US keyboard on the client. Once enabled it will perform the same as a local Linux installation set to your locale.
 
-### DRI3 GPU Acceleration (KasmVNC interface)
-
-For accelerated apps or games, render devices can be mounted into the container and leveraged by applications using:
-
-`--device /dev/dri:/dev/dri`
-
-This feature only supports **Open Source** GPU drivers:
-
-| Driver | Description |
-| :----: | --- |
-| Intel | i965 and i915 drivers for Intel iGPU chipsets |
-| AMD | AMDGPU, Radeon, and ATI drivers for AMD dedicated or APU chipsets |
-| NVIDIA | nouveau2 drivers only, closed source NVIDIA drivers lack DRI3 support |
-
-The `DRINODE` environment variable can be used to point to a specific GPU.
-Up to date information can be found [here](https://www.kasmweb.com/kasmvnc/docs/master/gpu_acceleration.html)
-
-### Nvidia GPU Support (KasmVNC interface)
-
-**Nvidia support is not compatible with Alpine based images as Alpine lacks Nvidia drivers**
-
-Nvidia support is available by leveraging Zink for OpenGL support. This can be enabled with the following run flags:
-
-| Variable | Description |
-| :----: | --- |
-| --gpus all | This can be filtered down but for most setups this will pass the one Nvidia GPU on the system |
-| --runtime nvidia | Specify the Nvidia runtime which mounts drivers and tools in from the host |
-
-The compose syntax is slightly different for this as you will need to set nvidia as the default runtime:
-
-```
-sudo nvidia-ctk runtime configure --runtime=docker --set-as-default
-sudo service docker restart
-```
-
-And to assign the GPU in compose:
-
-```
-services:
-  freetube:
-    image: lscr.io/linuxserver/freetube:selkies
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [compute,video,graphics,utility]
-```
-
 ### Application management
 
 #### PRoot Apps
