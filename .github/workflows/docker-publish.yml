@@ -79,21 +79,20 @@ jobs:
           name: changelog
           path: CHANGELOG.md
 
-      - name: Get, save, and upload latest FreeTube release ID
+      - name: Get latest FreeTube release ID and save to file
         run: |
           RELEASE_ID=$(curl -sL 'https://api.github.com/repos/FreeTubeApp/FreeTube/releases' \
             | jq -r 'map(select(.prerelease)) | first | .id')
           if [ -z "$RELEASE_ID" ] || [ "$RELEASE_ID" = "null" ]; then
-            echo "No pre-release found."
-            RELEASE_ID="none"
+            echo "none" > .last_freetube_id
+            echo "No pre-release found. Saved 'none'."
+          else
+            echo "$RELEASE_ID" > .last_freetube_id
+            echo "Saved release ID: $RELEASE_ID"
           fi
-          echo "Latest FreeTube pre-release ID: $RELEASE_ID"
-          echo "$RELEASE_ID" > .last_freetube_id
           ls -l .last_freetube_id
-        shell: bash
 
-      - name: Upload last built release ID
-        if: ${{ always() && !contains('none', steps.freetube_release.outputs.release_id) }}
+      - name: Upload last_freetube_id artifact
         uses: actions/upload-artifact@v4
         with:
           name: last_freetube_id
