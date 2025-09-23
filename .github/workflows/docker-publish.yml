@@ -24,18 +24,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Get latest FreeTube release ID
-        id: freetube_release
-        run: |
-          RELEASE_ID=$(curl -sL 'https://api.github.com/repos/FreeTubeApp/FreeTube/releases' \
-            | jq -r 'map(select(.prerelease)) | first | .id')
-          if [ -z "$RELEASE_ID" ] || [ "$RELEASE_ID" = "null" ]; then
-            echo "No pre-release found."
-            RELEASE_ID="none"
-          fi
-          echo "Latest FreeTube pre-release ID: $RELEASE_ID"
-          echo "release_id=$RELEASE_ID" >> $GITHUB_OUTPUT
-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -91,8 +79,18 @@ jobs:
           name: changelog
           path: CHANGELOG.md
 
-      - name: Save last release ID to file
-        run: echo "${{ steps.freetube_release.outputs.release_id }}" > .last_freetube_id
+      - name: Get and save latest FreeTube release ID
+        id: freetube_release
+        run: |
+          RELEASE_ID=$(curl -sL 'https://api.github.com/repos/FreeTubeApp/FreeTube/releases' \
+            | jq -r 'map(select(.prerelease)) | first | .id')
+          if [ -z "$RELEASE_ID" ] || [ "$RELEASE_ID" = "null" ]; then
+            echo "No pre-release found."
+            RELEASE_ID="none"
+          fi
+          echo "Latest FreeTube pre-release ID: $RELEASE_ID"
+          echo "$RELEASE_ID" > .last_freetube_id
+          ls -l .last_freetube_id
 
       - name: Upload last built release ID
         if: ${{ steps.freetube_release.outputs.release_id != 'none' }}
