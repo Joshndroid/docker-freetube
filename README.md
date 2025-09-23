@@ -56,7 +56,7 @@ The architectures supported by this image are:
 
 | Architecture | Available | Tag |
 | :----: | :----: | ---- |
-| x86-64 | ✅ | lastest, vX.X, selkies-dev|
+| x86-64 | ✅ | latest, vX.X, selkies-dev|
 | arm64 | ❌ | |
 | armhf | ❌ | |
 
