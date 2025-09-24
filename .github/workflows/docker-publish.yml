@@ -1,6 +1,11 @@
 name: Build and Publish Docker image
 
 on:
+  workflow_dispatch:
+    inputs:
+      release_id:
+        description: 'FreeTube release ID (optional)'
+        required: false
   push:
     branches:
       - selkies-dev
@@ -14,6 +19,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      actions: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -61,7 +67,7 @@ jobs:
         with:
           name: package_versions
           path: ./package_versions.txt
-          
+
       - name: Generate changelog
         uses: heinrichreimer/github-changelog-generator-action@v2.3
         with:
@@ -72,3 +78,22 @@ jobs:
         with:
           name: changelog
           path: CHANGELOG.md
+
+      - name: Get latest FreeTube release ID and save to file
+        run: |
+          RELEASE_ID=$(curl -sL 'https://api.github.com/repos/FreeTubeApp/FreeTube/releases' \
+            | jq -r 'map(select(.prerelease)) | first | .id')
+          if [ -z "$RELEASE_ID" ] || [ "$RELEASE_ID" = "null" ]; then
+            echo "none" > ./last_freetube_id.txt
+            echo "No pre-release found. Saved 'none'."
+          else
+            echo "$RELEASE_ID" > ./last_freetube_id.txt
+            echo "Saved release ID: $RELEASE_ID"
+          fi
+          ls -l ./last_freetube_id.txt
+
+      - name: Upload last_freetube_id artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: last_freetube_id
+          path: ./last_freetube_id.txt

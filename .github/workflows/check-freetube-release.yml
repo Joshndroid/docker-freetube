@@ -1,4 +1,4 @@
-name: Check for New FreeTube Release
+name: Check for New FreeTube Release (Dev)
 
 on:
   schedule:
@@ -8,24 +8,41 @@ on:
 jobs:
   check-and-trigger:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Get latest FreeTube release ID
         id: freetube_release
         run: |
-          RELEASE_ID=$(curl -sL 'https://api.github.com/repos/FreeTubeApp/FreeTube/releases' | jq -r 'map(select(.prerelease)) | first | .id')
+          RELEASE_ID=$(curl -sL 'https://api.github.com/repos/FreeTubeApp/FreeTube/releases' \
+            | jq -r 'map(select(.prerelease)) | first | .id')
           echo "release_id=$RELEASE_ID" >> $GITHUB_OUTPUT
 
-      - name: Get last built version from Docker image
-        id: last_version
-        run: |
-          IMAGE="ghcr.io/${{ github.repository }}:selkies"
-          docker pull $IMAGE || true
-          LABEL=$(docker inspect $IMAGE --format '{{ index .Config.Labels "build_version" }}' || echo "")
-          VERSION=$(echo $LABEL | awk '{print $3}')
-          echo "last_version=$VERSION" >> $GITHUB_OUTPUT
+      - name: Download previous last release artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: last_freetube_id
+          path: ./last_id
+        continue-on-error: true
 
-      - name: Compare versions and trigger build
-        if: steps.freetube_release.outputs.release_id != steps.last_version.outputs.last_version
+      - name: Read last release
+        id: last_release
         run: |
-          echo "New FreeTube release detected. Triggering Docker build..."
-          gh workflow run docker-publish.yml -f ref=selkies
+          if [ -f ./last_id/last_freetube_id.txt ]; then
+            LAST_ID=$(cat ./last_id/last_freetube_id.txt)
+          else
+            LAST_ID=""
+          fi
+          echo "last_id=$LAST_ID" >> $GITHUB_OUTPUT
+
+      - name: Compare and trigger dev build
+        if: steps.freetube_release.outputs.release_id != steps.last_release.outputs.last_id
+        run: |
+          echo "New FreeTube release detected. Triggering Docker build on selkies-dev..."
+          gh workflow run "Build and Publish Docker image" \
+            --repo ${{ github.repository }} \
+            --ref selkies-dev \
+            --field release_id=${{ steps.freetube_release.outputs.release_id }}
