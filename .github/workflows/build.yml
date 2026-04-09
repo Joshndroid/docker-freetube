@@ -37,5 +37,5 @@ jobs:
             VERSION=${{ github.ref_name }}
             FREETUBE_VERSION=${{ steps.freetube.outputs.version }}
           tags: |
-            ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:${{ github.ref_name }}
+            ghcr.io/${{ github.repository_owner | lower }}/${{ github.event.repository.name | lower }}:latest
+            ghcr.io/${{ github.repository_owner | lower }}/${{ github.event.repository.name | lower }}:${{ github.ref_name }}
