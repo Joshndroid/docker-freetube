@@ -1,30 +1,24 @@
 FROM ghcr.io/linuxserver/baseimage-selkies:debianbookworm
 
-# set version label
 ARG BUILD_DATE
 ARG VERSION
 ARG FREETUBE_VERSION
 LABEL build_version="joshndroid version:- ${VERSION} Build-date:- ${BUILD_DATE}"
 LABEL maintainer="joshndroid"
 
-# title
 ENV TITLE=FreeTube
 
 RUN \
-   echo "**** add icon ****" && \
-   curl -o \
-     /usr/share/selkies/www/icon.png \
-     https://raw.githubusercontent.com/FreeTubeApp/FreeTube/development/_icons/iconColor.png && \
+  echo "**** add icon ****" && \
+  curl -o \
+    /usr/share/selkies/www/icon.png \
+    https://raw.githubusercontent.com/FreeTubeApp/FreeTube/development/_icons/iconColor.png && \
   echo "**** install packages ****" && \
   apt-get update && \
   apt-get install -y --no-install-recommends \
     jq && \
-  if [ -z ${FREETUBE_VERSION+x} ]; then \
-    FREETUBE_VERSION=$(curl -sL "https://api.github.com/repos/FreeTubeApp/FreeTube/releases" \
-      | jq -r 'map(select(.prerelease)) | first | .id'); \
-  fi && \
-  URL=$(curl -sL "https://api.github.com/repos/FreeTubeApp/FreeTube/releases/${FREETUBE_VERSION}" \
-    |jq -r '.assets[]|select(.name|endswith("amd64.deb")).browser_download_url') && \
+  URL=$(curl -sL "https://api.github.com/repos/FreeTubeApp/FreeTube/releases/tags/${FREETUBE_VERSION}" \
+    | jq -r '.assets[] | select(.name | endswith("amd64.deb")) | .browser_download_url') && \
   curl -o \
     /tmp/freetube.deb -L \
     "${URL}" && \
@@ -41,10 +35,7 @@ RUN \
     /tmp/* && \
   dpkg-query -W -f='${Package}\t${Version}\t${Architecture}\n' > /package_versions.txt
 
-# add local files
 COPY /root /
 
-# ports and volumes
 EXPOSE 3000
-
 VOLUME /config
