@@ -15,8 +15,12 @@ jobs:
 
       - name: Get latest FreeTube prerelease tag
         id: freetube
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TAG=$(curl -sL "https://api.github.com/repos/FreeTubeApp/FreeTube/releases" \
+          TAG=$(curl -sL \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            "https://api.github.com/repos/FreeTubeApp/FreeTube/releases" \
             | jq -r 'map(select(.prerelease)) | first | .tag_name')
           echo "version=${TAG}" >> $GITHUB_OUTPUT
 
