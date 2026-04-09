@@ -1,4 +1,4 @@
-FROM ghcr.io/linuxserver/baseimage-selkies:debianbookworm
+FROM ghcr.io/linuxserver/baseimage-selkies:ubunturesolute
 
 ARG BUILD_DATE
 ARG VERSION
