@@ -18,7 +18,7 @@ RUN \
   apt-get install -y --no-install-recommends \
     jq && \
   URL=$(curl -sL "https://api.github.com/repos/FreeTubeApp/FreeTube/releases/tags/${FREETUBE_VERSION}" \
-    | jq -r '.assets[] | select(.name | endswith("amd64.deb")) | .browser_download_url') && \
+    | jq -r --arg arch "$(dpkg --print-architecture)" '.assets[] | select(.name | endswith($arch + ".deb")) | .browser_download_url') && \
   curl -o \
     /tmp/freetube.deb -L \
     "${URL}" && \
