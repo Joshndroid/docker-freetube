@@ -21,7 +21,7 @@ jobs:
           TAG=$(curl -sL \
             -H "Authorization: Bearer $GH_TOKEN" \
             "https://api.github.com/repos/FreeTubeApp/FreeTube/releases" \
-            | jq -r 'map(select(.prerelease)) | first | .tag_name')
+            | jq -r 'map(select(.prerelease)) | sort_by(.published_at) | reverse | first | .tag_name')
           echo "version=${TAG}" >> $GITHUB_OUTPUT
 
       - name: Set up QEMU
