@@ -1,41 +1,56 @@
-FROM ghcr.io/linuxserver/baseimage-selkies:ubunturesolute
+FROM ghcr.io/linuxserver/baseimage-ubuntu:ubunturesolute
 
-ARG BUILD_DATE
-ARG VERSION
-ARG FREETUBE_VERSION
-LABEL build_version="joshndroid version:- ${VERSION} Build-date:- ${BUILD_DATE}"
-LABEL maintainer="joshndroid"
+ENV DEBIAN_FRONTEND=noninteractive
 
-ENV TITLE=FreeTube
+# -------------------------------------------------------
+# Install minimal X11 + XWayland + KasmVNC dependencies
+# -------------------------------------------------------
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        xserver-xorg-video-dummy \
+        x11-xserver-utils \
+        xwayland \
+        xvfb \
+        openbox \
+        curl \
+        wget \
+        ca-certificates \
+        libasound2 \
+        libnss3 \
+        libxss1 \
+        libatk-bridge2.0-0 \
+        libgtk-3-0 \
+        libgbm1 \
+        libxshmfence1 && \
+    rm -rf /var/lib/apt/lists/*
 
-RUN \
-  echo "**** add icon ****" && \
-  curl -o \
-    /usr/share/selkies/www/icon.png \
-    https://raw.githubusercontent.com/FreeTubeApp/FreeTube/development/_icons/iconColor.png && \
-  echo "**** install packages ****" && \
-  apt-get update && \
-  apt-get install -y --no-install-recommends \
-    jq && \
-  URL=$(curl -sL "https://api.github.com/repos/FreeTubeApp/FreeTube/releases/tags/${FREETUBE_VERSION}" \
-    | jq -r --arg arch "$(dpkg --print-architecture)" '.assets[] | select(.name | endswith($arch + ".deb")) | .browser_download_url') && \
-  curl -o \
-    /tmp/freetube.deb -L \
-    "${URL}" && \
-  apt install -y --no-install-recommends \
-    /tmp/freetube.deb && \
-  rm -f \
-    /usr/bin/freetube && \
-  echo "**** cleanup ****" && \
-  apt-get autoclean && \
-  rm -rf \
-    /config/.cache \
-    /var/lib/apt/lists/* \
-    /var/tmp/* \
-    /tmp/* && \
-  dpkg-query -W -f='${Package}\t${Version}\t${Architecture}\n' > /package_versions.txt
+# -------------------------------------------------------
+# Install KasmVNC
+# -------------------------------------------------------
+RUN wget https://github.com/kasmtech/KasmVNC/releases/latest/download/kasmvncserver_ubuntu.deb -O /tmp/kasmvnc.deb && \
+    dpkg -i /tmp/kasmvnc.deb || apt-get -f install -y && \
+    rm /tmp/kasmvnc.deb
 
-COPY /root /
+# -------------------------------------------------------
+# Install FreeTube (latest .deb)
+# -------------------------------------------------------
+RUN wget https://github.com/FreeTubeApp/FreeTube/releases/latest/download/freetube_amd64.deb -O /tmp/freetube.deb && \
+    dpkg -i /tmp/freetube.deb || apt-get -f install -y && \
+    rm /tmp/freetube.deb
 
-EXPOSE 3000
-VOLUME /config
+# -------------------------------------------------------
+# Create kiosk startup script
+# -------------------------------------------------------
+RUN mkdir -p /opt/kiosk
+COPY start.sh /opt/kiosk/start.sh
+RUN chmod +x /opt/kiosk/start.sh
+
+# -------------------------------------------------------
+# Expose VNC/WebSocket port
+# -------------------------------------------------------
+EXPOSE 6901
+
+# -------------------------------------------------------
+# Start KasmVNC + FreeTube kiosk
+# -------------------------------------------------------
+ENTRYPOINT ["/opt/kiosk/start.sh"]
