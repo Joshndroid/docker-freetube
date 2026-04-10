@@ -19,7 +19,8 @@ tigervncserver :1 \
     -depth 24 \
     -localhost no \
     -SecurityTypes None \
-    -rfbport 5901 &
+    -rfbport 5901 \
+    --I-KNOW-THIS-IS-INSECURE &
 sleep 1
 
 # Start noVNC on port 6901 (browser access)
