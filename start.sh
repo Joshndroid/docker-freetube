@@ -1,14 +1,31 @@
 #!/bin/bash
+set -e
 
-# Start a virtual X11 display
-Xvfb :0 -screen 0 1920x1080x24 &
+# Start PulseAudio for audio support
+pulseaudio --start --exit-idle-time=-1
 
-# Start KasmVNC server
-kasmvncserver --bind 0.0.0.0 --port 6901 --display :0 &
+# Start virtual display
+Xvfb :1 -screen 0 1920x1080x24 &
+sleep 1
 
-# Optional: minimal WM for window focus handling
+export DISPLAY=:1
+
+# Start minimal window manager
 openbox &
 
+# Start TigerVNC on port 5901
+tigervncserver :1 \
+    -geometry 1920x1080 \
+    -depth 24 \
+    -localhost no \
+    -SecurityTypes None \
+    -rfbport 5901 &
+sleep 1
+
+# Start noVNC on port 6901 (browser access)
+websockify --web /usr/share/novnc \
+    --wrap-mode=ignore \
+    6901 localhost:5901 &
+
 # Launch FreeTube in kiosk mode
-export DISPLAY=:0
-freetube --kiosk --no-sandbox
+exec freetube --kiosk --no-sandbox --disable-dev-shm-usage

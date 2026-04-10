@@ -1,42 +1,40 @@
 FROM ubuntu:26.04
-
 ENV DEBIAN_FRONTEND=noninteractive
 
 # -------------------------------------------------------
-# Install minimal X11 + XWayland + KasmVNC dependencies
+# Install X11 + TigerVNC + noVNC + audio + app deps
 # -------------------------------------------------------
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        xserver-xorg-video-dummy \
-        x11-xserver-utils \
-        xwayland \
         xvfb \
+        x11-xserver-utils \
         openbox \
+        tigervnc-standalone-server \
+        tigervnc-common \
+        novnc \
+        websockify \
+        pulseaudio \
         curl \
         wget \
         ca-certificates \
-        libasound2 \
+        libasound2t64 \
         libnss3 \
         libxss1 \
-        libatk-bridge2.0-0 \
-        libgtk-3-0 \
+        libatk-bridge2.0-0t64 \
+        libgtk-3-0t64 \
         libgbm1 \
         libxshmfence1 && \
     rm -rf /var/lib/apt/lists/*
 
 # -------------------------------------------------------
-# Install KasmVNC
+# Install FreeTube (pinned to latest known good release)
 # -------------------------------------------------------
-RUN wget https://github.com/kasmtech/KasmVNC/releases/latest/download/kasmvncserver_ubuntu.deb -O /tmp/kasmvnc.deb && \
-    dpkg -i /tmp/kasmvnc.deb || apt-get -f install -y && \
-    rm /tmp/kasmvnc.deb
-
-# -------------------------------------------------------
-# Install FreeTube (latest .deb)
-# -------------------------------------------------------
-RUN wget https://github.com/FreeTubeApp/FreeTube/releases/latest/download/freetube_amd64.deb -O /tmp/freetube.deb && \
-    dpkg -i /tmp/freetube.deb || apt-get -f install -y && \
-    rm /tmp/freetube.deb
+RUN wget https://github.com/FreeTubeApp/FreeTube/releases/download/v0.23.13-beta/freetube_0.23.13_beta_amd64.deb \
+        -O /tmp/freetube.deb && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends /tmp/freetube.deb && \
+    rm /tmp/freetube.deb && \
+    rm -rf /var/lib/apt/lists/*
 
 # -------------------------------------------------------
 # Create kiosk startup script
@@ -46,11 +44,9 @@ COPY start.sh /opt/kiosk/start.sh
 RUN chmod +x /opt/kiosk/start.sh
 
 # -------------------------------------------------------
-# Expose VNC/WebSocket port
+# Expose noVNC port (browser) and VNC port (native client)
 # -------------------------------------------------------
 EXPOSE 6901
+EXPOSE 5901
 
-# -------------------------------------------------------
-# Start KasmVNC + FreeTube kiosk
-# -------------------------------------------------------
 ENTRYPOINT ["/opt/kiosk/start.sh"]
