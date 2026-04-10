@@ -1,4 +1,4 @@
-FROM ghcr.io/linuxserver/baseimage-ubuntu:ubunturesolute
+FROM ghcr.io/linuxserver/baseimage-ubuntu:resolute-e5622774-ls1
 
 ENV DEBIAN_FRONTEND=noninteractive
 
