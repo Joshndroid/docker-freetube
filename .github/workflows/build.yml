@@ -4,7 +4,7 @@ on:
   push:
     tags:
       - 'v*'
-      - 'kasm-*'
+      - 'tiger-*'
 
 jobs:
   build:
@@ -49,5 +49,5 @@ jobs:
             VERSION=${{ github.ref_name }}
             FREETUBE_VERSION=${{ steps.freetube.outputs.version }}
           tags: |
-            ghcr.io/joshndroid/freetube-kasm:latest
-            ghcr.io/joshndroid/freetube-kasm:${{ github.ref_name }}
+            ghcr.io/joshndroid/freetube-tiger:latest
+            ghcr.io/joshndroid/freetube-tiger:${{ github.ref_name }}
